@@ -1,12 +1,13 @@
-import src from "../assets/chef-ai.png";
+import logo from '../assets/chef-ai.png';
+
 export default function Header() {
 	return (
-		<header className="p-6 flex gap-2 font-normal items-center-safe justify-center header-shadow mb-4">
-			<figure>
-				<img src={src} alt="chef ai logo" className="w-12 h-auto" />
-				<figcaption className="hidden">chef ai logo</figcaption>
-			</figure>
-			<h1 className="text-3xl">Chef Ai</h1>
+		<header className="site-header">
+			<div className="brand" aria-label="Chef AI">
+				<img src={logo} alt="" className="brand-mark" />
+				<span className="brand-name">chef<span>ai</span></span>
+			</div>
+			<div className="header-note"><span className="header-sparkle" aria-hidden="true">✳</span> COOK A LITTLE MORE OFTEN</div>
 		</header>
 	);
 }

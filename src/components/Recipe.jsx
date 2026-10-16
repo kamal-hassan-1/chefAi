@@ -1,13 +1,37 @@
-import ReactMarkDown from "react-markdown";
-export default function Recipe(props) {
+import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+
+export default function Recipe({ recipe }) {
+	const [copied, setCopied] = useState(false);
+
+	const copyRecipe = async () => {
+		try {
+			await navigator.clipboard.writeText(recipe);
+			setCopied(true);
+			window.setTimeout(() => setCopied(false), 1800);
+		} catch {
+			setCopied(false);
+		}
+	};
+
 	return (
-		<section
-			className="suggested-recipe-container mt-9 text-gray-700 w-full min-w-0 wrap-break-word"
-			aria-live="polite">
-			<h2 className="text-2xl font-semibold mb-4"> Chef Claude Recommends:</h2>
-			<div className="overflow-x-auto">
-				<ReactMarkDown>{props.recipe}</ReactMarkDown>
+		<article className="recipe-card">
+			<div className="recipe-card-top">
+				<div className="recipe-card-label"><span aria-hidden="true">✳</span> FRESH FROM THE IMAGINATION</div>
+				<div className="recipe-actions">
+					<button type="button" className="recipe-action" onClick={copyRecipe} aria-label="Copy recipe">
+						{copied ? 'Copied ✓' : 'Copy'}
+					</button>
+					<button type="button" className="recipe-action print-action" onClick={() => window.print()}>Print</button>
+				</div>
 			</div>
-		</section>
+			<div className="recipe-body">
+				<ReactMarkdown>{recipe}</ReactMarkdown>
+			</div>
+			<div className="recipe-card-footer">
+				<span>Made for your kitchen, with a little help from AI.</span>
+				<span aria-hidden="true">Bon appétit <b>✳</b></span>
+			</div>
+		</article>
 	);
 }

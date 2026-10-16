@@ -1,94 +1,221 @@
-//--------------------------------------------------- IMPORTS -----------------------------------------------------------------
-import React from "react";
-import Recipe from "./components/Recipe";
-import IngredientList from "./components/IngredientList";
-import chefAI from "../ai";
+import { useEffect, useRef, useState } from 'react';
+import IngredientList from './components/IngredientList';
+import Recipe from './components/Recipe';
+import chefAI from '../ai';
 
-//-------------------------------------------------- COMPONENT ----------------------------------------------------------------
+const QUICK_ADDS = ['eggs', 'spinach', 'chickpeas', 'parmesan', 'tomatoes'];
+const MAX_INGREDIENTS = 12;
 
-export default function AddIngredient() {
-	const [ingredients, setIngredients] = React.useState([]);
-	const [recipe, setRecipe] = React.useState("");
-	const [loading, setLoading] = React.useState(false);
+function getFriendlyError(error) {
+	if (error.code === 'RATE_LIMIT') {
+		return 'The chef is on a tiny free-plan break. Give it a little while, then try again.';
+	}
+	if (error.code === 'CONFIGURATION') {
+		return 'The kitchen is missing its API key. The project owner needs to check the server settings.';
+	}
+	if (error.code === 'INVALID_INPUT') {
+		return 'That ingredient list confused the pantry. Please edit it and try again.';
+	}
+	if (!navigator.onLine) {
+		return 'The kitchen signal dropped. Reconnect to the internet and give it another go.';
+	}
+	return 'The chef dropped the ladle. Try again in a moment.';
+}
 
-	// -------------------------------------------------- FUNCTIONS ----------------------------------------------------------------
+export default function Main() {
+	const [ingredients, setIngredients] = useState([]);
+	const [draft, setDraft] = useState('');
+	const [feedback, setFeedback] = useState('');
+	const [recipe, setRecipe] = useState('');
+	const [recipeError, setRecipeError] = useState('');
+	const [loading, setLoading] = useState(false);
+	const recipeRef = useRef(null);
 
-	const submitIngredient = (formData) => {
-		const newIngredient = formData.get("ingredient");
-		setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+	useEffect(() => {
+		if (recipe) recipeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}, [recipe]);
+
+	const addIngredient = (value = draft) => {
+		const ingredient = value.trim().replace(/\s+/g, ' ');
+		if (!ingredient) {
+			setFeedback('Type an ingredient first. The chef is talented, but not psychic.');
+			return;
+		}
+		if (ingredient.length > 50) {
+			setFeedback('Keep each ingredient under 50 characters. This is a pantry, not a novel.');
+			return;
+		}
+		if (ingredients.some((item) => item.toLowerCase() === ingredient.toLowerCase())) {
+			setFeedback(`${ingredient} is already on the list. We have excellent memory for snacks.`);
+			return;
+		}
+		if (ingredients.length >= MAX_INGREDIENTS) {
+			setFeedback(`That is a very full pantry. The limit is ${MAX_INGREDIENTS} ingredients.`);
+			return;
+		}
+
+		setIngredients((current) => [...current, ingredient]);
+		setDraft('');
+		setFeedback(`${ingredient} added. Nice choice.`);
+		setRecipe('');
+		setRecipeError('');
 	};
 
-	const fetchRecipe = async () => {
+	const handleAdd = (event) => {
+		event.preventDefault();
+		addIngredient();
+	};
+
+	const removeIngredient = (ingredientToRemove) => {
+		setIngredients((current) => current.filter((ingredient) => ingredient !== ingredientToRemove));
+		setRecipe('');
+		setRecipeError('');
+		setFeedback(`${ingredientToRemove} removed. No hard feelings.`);
+	};
+
+	const generateRecipe = async () => {
+		if (ingredients.length < 3 || loading) return;
 		setLoading(true);
-		setRecipe(await chefAI(ingredients));
-		setLoading(false);
+		setRecipe('');
+		setRecipeError('');
+		try {
+			setRecipe(await chefAI(ingredients));
+		} catch (error) {
+			setRecipeError(getFriendlyError(error));
+		}	finally {
+			setLoading(false);
+		}
 	};
 
-	//----------------------------------------------------- RENDER -----------------------------------------------------------------
+	const resetPantry = () => {
+		setIngredients([]);
+		setDraft('');
+		setRecipe('');
+		setRecipeError('');
+		setFeedback('Fresh start. What are we working with?');
+	};
+
+	const quickAdds = QUICK_ADDS.filter(
+		(item) => !ingredients.some((ingredient) => ingredient.toLowerCase() === item.toLowerCase()),
+	).slice(0, Math.max(0, MAX_INGREDIENTS - ingredients.length));
 
 	return (
-		<main className="px-8 pt-2.5 flex flex-col justify-start m-10">
-			{/* Section 1 - Submit Ingredients Form */}
-			<section id="add ingredients form">
-				<form
-					action={submitIngredient}
-					className="add-ingredient-form">
-					<input
-						className="add-ingredient-form-input"
-						title="Add at least 3 ingredients"
-						type="text"
-						placeholder="e.g. oregano"
-						aria-label="Add ingredient"
-						name="ingredient"
-					/>
-					<button className="add-ingredient-form-button cursor-pointer">Add ingredient</button>
-				</form>
+		<main className="page-shell">
+			<section className="hero" aria-labelledby="page-title">
+				<div className="hero-copy">
+					<p className="eyebrow"><span className="eyebrow-dot" /> YOUR LITTLE KITCHEN SIDEKICK</p>
+					<h1 id="page-title">Good food starts with <em>what you have.</em></h1>
+					<p className="hero-description">
+						A few ingredients, a little imagination, and dinner is suddenly handled.
+					</p>
+				</div>
+				<div className="hero-stamp" aria-hidden="true">
+					<div className="stamp-sun" />
+					<span className="stamp-leaf stamp-leaf-one">✳</span>
+					<span className="stamp-leaf stamp-leaf-two">✦</span>
+					<div className="stamp-plate"><span>made<br />with<br /><b>what’s<br />here</b></span></div>
+				</div>
 			</section>
 
-			{/* Section 2 - Ingredients and Get Recipe */}
-			{ingredients.length > 0 && <IngredientList ingredients={ingredients} />}
-
-			{ingredients.length > 2 && (
-				<div className="generate-recipe-container flex justify-between items-center rounded-lg bg-[#F0EFEB] px-7 py-4 mt-9">
-					<div>
-						<h3 className="text-[1.125rem] font-medium leading-6 mb-2">Ready for a recipe?</h3>
-						<p className="text-[#6B7280] text-[0.875rem] leading-5">Generate a recipe from your list of ingredients.</p>
+			<div className="studio-grid">
+				<section className="pantry-card" aria-labelledby="pantry-title">
+					<div className="panel-heading">
+						<div>
+							<p className="section-kicker">STEP 01 <span>·</span> THE PANTRY</p>
+							<h2 id="pantry-title">What’s on hand?</h2>
+						</div>
+						<span className="ingredient-count" aria-label={`${ingredients.length} of ${MAX_INGREDIENTS} ingredients`}>
+							{String(ingredients.length).padStart(2, '0')}<i> / {MAX_INGREDIENTS}</i>
+						</span>
 					</div>
-					<button
-						onClick={fetchRecipe}
-						className="border-none rounded-md bg-[#D17557] shadow-sm text-[#FAFAF8] ml-2 sm:ml-0 px-4 py-2.5 text-[0.875rem] cursor-pointer">
-						Get a recipe
-					</button>
-				</div>
-			)}
 
-			{/* Section 3 - Chef Response */}
-			{loading && (
-				<div className="flex items-center gap-3 mt-9 text-gray-500">
-					<svg
-						className="animate-spin h-6 w-6 text-[#D17557]"
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-					>
-						<circle
-							className="opacity-25"
-							cx="12"
-							cy="12"
-							r="10"
-							stroke="currentColor"
-							strokeWidth="4"
+					<form className="ingredient-form" onSubmit={handleAdd}>
+						<label className="sr-only" htmlFor="ingredient-input">Add an ingredient</label>
+						<input
+							id="ingredient-input"
+							className="ingredient-input"
+							name="ingredient"
+							value={draft}
+							onChange={(event) => setDraft(event.target.value)}
+							placeholder="e.g. a lonely sweet potato"
+							maxLength={60}
+							autoComplete="off"
 						/>
-						<path
-							className="opacity-75"
-							fill="currentColor"
-							d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-						/>
-					</svg>
-					<span className="text-sm">Chef AI is cooking up your recipe…</span>
-				</div>
-			)}
-			{recipe && <Recipe recipe={recipe} />}
+						<button className="add-button" type="submit" aria-label="Add ingredient">
+							<span aria-hidden="true">+</span><span>Add</span>
+						</button>
+					</form>
+					<p className="field-hint">Press Enter or tap Add. Keep it simple: one ingredient at a time.</p>
+					<div className="quick-adds" aria-label="Quick add suggestions">
+						<span className="quick-label">QUICK ADD</span>
+						{quickAdds.map((item) => (
+							<button key={item} type="button" className="suggestion-chip" onClick={() => addIngredient(item)}>
+								+ {item}
+							</button>
+						))}
+					</div>
+					<p className="feedback-line" aria-live="polite">{feedback || 'Start with whatever needs using up.'}</p>
+
+					<div className="ingredient-list-wrap">
+						<IngredientList ingredients={ingredients} onRemove={removeIngredient} />
+					</div>
+
+					<div className="pantry-footer">
+						<div className="unlock-copy">
+							<span className="unlock-icon" aria-hidden="true">✳</span>
+							<div>
+								<strong>{ingredients.length >= 3 ? 'Recipe time.' : `${3 - ingredients.length} more to unlock`}</strong>
+								<span>{ingredients.length >= 3 ? 'Your ingredients are ready for their glow-up.' : 'Add at least 3 ingredients to get cooking.'}</span>
+							</div>
+						</div>
+						<button
+							className="generate-button"
+							type="button"
+							onClick={generateRecipe}
+							disabled={ingredients.length < 3 || loading}
+						>
+							{loading ? <><span className="button-spinner" /> Cooking…</> : <>Find my recipe <span aria-hidden="true">↗</span></>}
+						</button>
+						{ingredients.length > 0 && <button className="reset-button" type="button" onClick={resetPantry}>Clear pantry</button>}
+					</div>
+				</section>
+
+				<section className="recipe-stage" ref={recipeRef} aria-label="Recipe results" aria-live="polite">
+					{loading ? (
+						<div className="empty-recipe loading-card">
+							<div className="loading-orbit"><span>✳</span></div>
+							<p className="section-kicker">A LITTLE KITCHEN MAGIC</p>
+							<h2>Let’s see what’s cooking.</h2>
+							<p>Our chef is turning your ingredients into something delicious.</p>
+							<div className="loading-progress"><span /></div>
+						</div>
+					) : recipe ? (
+						<Recipe recipe={recipe} />
+					) : recipeError ? (
+						<div className="empty-recipe error-card" role="alert">
+							<div className="empty-icon error-icon" aria-hidden="true">!</div>
+							<p className="section-kicker">A SMALL KITCHEN DETOUR</p>
+							<h2>{recipeError}</h2>
+							<button className="retry-button" type="button" onClick={generateRecipe}>Try again <span aria-hidden="true">↗</span></button>
+						</div>
+					) : (
+						<div className="empty-recipe">
+							<div className="plate-illustration" aria-hidden="true">
+								<div className="plate-ring"><span className="plate-herb herb-one">✿</span><span className="plate-herb herb-two">✦</span><span className="plate-herb herb-three">✳</span><div className="plate-center">A pinch<br />of this,<br /><em>a bit of that.</em></div></div>
+							</div>
+							<p className="section-kicker">STEP 02 <span>·</span> THE GOOD PART</p>
+							<h2>Your next favorite<br />meal goes here.</h2>
+							<p>Add three ingredients and we’ll find them a delicious purpose.</p>
+							<div className="recipe-note"><span aria-hidden="true">✳</span> No judgment about the half-used jar in the fridge.</div>
+						</div>
+					)}
+				</section>
+			</div>
+
+			<footer className="page-footer">
+				<span>MADE FOR REAL-LIFE FRIDGES</span>
+				<span>Good things can come from leftovers <i>✳</i></span>
+			</footer>
 		</main>
 	);
 }

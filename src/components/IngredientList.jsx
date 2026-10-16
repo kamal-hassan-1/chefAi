@@ -1,19 +1,29 @@
-export default function ingredientList(props) {
-	const populateIngredientsListItems = () => {
-		return props.ingredients.map((ingredient) => (
-			<li
-				key={ingredient}
-				className="mb-1">
-				{ingredient}
-			</li>
-		));
-	};
-	return (
-		<section>
-			<div id="ingredient-list-container">
-				<h2 className="text-2xl sm:text-3xl font-semibold mt-6">Ingredients on hand:</h2>
-				<ul className="text-gray-600 text-[0.875rem] list-disc ml-6 mt-2.5">{populateIngredientsListItems()}</ul>
+export default function IngredientList({ ingredients, onRemove }) {
+	if (!ingredients.length) {
+		return (
+			<div className="pantry-empty">
+				<span className="pantry-empty-icon" aria-hidden="true">＋</span>
+				<span>Your ingredient list will show up here.</span>
 			</div>
-		</section>
+		);
+	}
+
+	return (
+		<div className="ingredient-list-section">
+			<div className="list-heading">
+				<h3>In your pantry <span>({ingredients.length})</span></h3>
+				<span className="list-instruction">Tap × to remove</span>
+			</div>
+			<ul className="ingredient-chips">
+				{ingredients.map((ingredient) => (
+					<li className="ingredient-chip" key={ingredient}>
+						<span>{ingredient}</span>
+						<button type="button" onClick={() => onRemove(ingredient)} aria-label={`Remove ${ingredient}`}>
+							<span aria-hidden="true">×</span>
+						</button>
+					</li>
+				))}
+			</ul>
+		</div>
 	);
 }

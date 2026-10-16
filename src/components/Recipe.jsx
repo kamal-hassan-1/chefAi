@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function Recipe({ recipe }) {
 	const [copied, setCopied] = useState(false);
@@ -26,7 +27,18 @@ export default function Recipe({ recipe }) {
 				</div>
 			</div>
 			<div className="recipe-body">
-				<ReactMarkdown>{recipe}</ReactMarkdown>
+				<ReactMarkdown
+					remarkPlugins={[remarkGfm]}
+					components={{
+						table: ({ children }) => (
+							<div className="markdown-table-wrap">
+								<table>{children}</table>
+							</div>
+						),
+					}}
+				>
+					{recipe}
+				</ReactMarkdown>
 			</div>
 			<div className="recipe-card-footer">
 				<span>Made for your kitchen, with a little help from AI.</span>

@@ -51,24 +51,21 @@ button:focus-visible, input:focus-visible, a:focus-visible {
 }
 
 .site-header {
-	width: 100%;
-	max-width: none;
+	max-width: 1160px;
 	height: 82px;
-	margin: 0;
-	padding: 0 max(22px, calc((100% - 1116px) / 2));
+	margin: 0 auto;
+	padding: 0 22px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	border-bottom: 1px solid rgba(255, 255, 255, .1);
-	background: #263b30;
-	box-shadow: 0 5px 18px rgba(33, 49, 38, .12);
+	border-bottom: 1px solid rgba(67, 80, 62, .12);
 }
 
-.brand { display: inline-flex; align-items: center; gap: 10px; color: #f6f4ec; text-decoration: none; }
-.brand-mark { width: 39px; height: 39px; padding: 3px; border-radius: 50%; background: #f6f4ec; object-fit: contain; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.brand-mark { width: 39px; height: 39px; object-fit: contain; }
 .brand-name { font-size: 20px; font-weight: 700; letter-spacing: -.9px; }
-.brand-name span { color: #efa17e; }
-.header-note { color: #d3ddce; font-size: 10px; font-weight: 700; letter-spacing: 1.45px; }
+.brand-name span { color: var(--orange); }
+.header-note { color: #687465; font-size: 10px; font-weight: 700; letter-spacing: 1.45px; }
 .header-sparkle { color: var(--orange); margin-right: 6px; font-size: 13px; }
 
 .page-shell { max-width: 1160px; margin: 0 auto; padding: 0 22px 24px; }
@@ -90,31 +87,31 @@ button:focus-visible, input:focus-visible, a:focus-visible {
 
 .studio-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: stretch; }
 .pantry-card, .recipe-stage { min-width: 0; border: 1px solid rgba(55, 73, 57, .1); border-radius: 22px; background: rgba(255, 255, 252, .84); box-shadow: 0 12px 34px rgba(53, 68, 52, .045); }
-.pantry-card { padding: 29px 30px 23px; display: flex; flex-direction: column; }
-.panel-heading { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; }
+.pantry-card { padding: 35px 38px 29px; display: flex; flex-direction: column; }
+.panel-heading { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
 .section-kicker span { color: var(--orange); padding: 0 3px; }
 .panel-heading h2, .empty-recipe h2 { font-family: Fraunces, Georgia, serif; font-size: 28px; font-weight: 500; letter-spacing: -.7px; line-height: 1.15; }
-.panel-heading h2 { margin: 6px 0 0; }
+.panel-heading h2 { margin: 6px 0 0; font-size: 31px; }
 .ingredient-count { color: var(--olive); font-family: Fraunces, Georgia, serif; font-size: 22px; line-height: 1; }
 .ingredient-count i { color: #a5a99b; font-family: 'DM Sans', sans-serif; font-size: 11px; font-style: normal; }
 
 .ingredient-form { display: flex; gap: 9px; }
-.ingredient-input { min-width: 0; height: 48px; flex: 1; padding: 0 15px; border: 1px solid #dedfd4; border-radius: 10px; background: #fff; color: var(--ink); font-size: 13px; transition: border-color .2s, box-shadow .2s; }
+.ingredient-input { min-width: 0; height: 54px; flex: 1; padding: 0 17px; border: 1px solid #dedfd4; border-radius: 10px; background: #fff; color: var(--ink); font-size: 14px; transition: border-color .2s, box-shadow .2s; }
 .ingredient-input::placeholder { color: #a1a69a; }
 .ingredient-input:focus { border-color: #8a9b7c; box-shadow: 0 0 0 3px rgba(85, 112, 90, .1); outline: 0; }
-.add-button { min-width: 79px; height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 10px; background: var(--ink); color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; transition: background .2s, transform .2s; }
+.add-button { min-width: 88px; height: 54px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 10px; background: var(--ink); color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; transition: background .2s, transform .2s; }
 .add-button:hover { background: var(--olive-dark); transform: translateY(-1px); }
 .add-button span:first-child { font-size: 19px; font-weight: 400; line-height: 1; }
 .field-hint { margin: 8px 0 0; color: #9a9f92; font-size: 10px; }
 .quick-adds { min-height: 60px; display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 11px 0 10px; }
 .quick-label { margin-right: 2px; color: #a3a698; font-size: 8px; font-weight: 700; letter-spacing: 1.1px; }
-.suggestion-chip { padding: 6px 9px; border: 1px solid #e7e8df; border-radius: 999px; background: transparent; color: #687465; cursor: pointer; font-size: 10px; transition: color .18s, border-color .18s, background .18s; }
+.suggestion-chip { padding: 7px 11px; border: 1px solid #e7e8df; border-radius: 999px; background: transparent; color: #687465; cursor: pointer; font-size: 11px; transition: color .18s, border-color .18s, background .18s; }
 .suggestion-chip:hover { border-color: #c4cfb9; background: #f3f5ed; color: var(--olive-dark); }
 .feedback-line { min-height: 18px; margin: 1px 0 8px; color: var(--olive); font-size: 11px; }
-.ingredient-list-wrap { min-height: 148px; padding: 12px 0 14px; border-top: 1px solid #eeeee8; border-bottom: 1px solid #eeeee8; }
-.pantry-empty { min-height: 118px; display: flex; align-items: center; justify-content: center; gap: 9px; color: #a4a99e; font-size: 11px; }
+.ingredient-list-wrap { min-height: 164px; padding: 15px 0 17px; border-top: 1px solid #eeeee8; border-bottom: 1px solid #eeeee8; }
+.pantry-empty { min-height: 130px; display: flex; align-items: center; justify-content: center; gap: 9px; color: #a4a99e; font-size: 12px; }
 .pantry-empty-icon { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 50%; background: #f3f4ed; color: var(--olive); font-size: 15px; }
-.ingredient-list-section { min-height: 118px; }
+.ingredient-list-section { min-height: 130px; }
 .list-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
 .list-heading h3 { margin: 0; color: #697365; font-size: 10px; font-weight: 700; }
 .list-heading h3 span { color: #a0a698; font-weight: 500; }
@@ -221,11 +218,11 @@ button:focus-visible, input:focus-visible, a:focus-visible {
 	.hero h1 { max-width: 390px; margin-top: 13px; font-size: clamp(40px, 12vw, 56px); letter-spacing: -2.1px; }
 	.hero-description { max-width: 290px; font-size: 13px; }
 	.hero-stamp { position: absolute; right: -12px; top: 19px; opacity: .32; transform: scale(.65); }
-	.pantry-card { padding: 22px 18px 17px; border-radius: 17px; }
-	.panel-heading h2 { font-size: 25px; }
+	.pantry-card { padding: 26px 21px 20px; border-radius: 17px; }
+	.panel-heading h2 { font-size: 27px; }
 	.ingredient-form { gap: 7px; }
-	.ingredient-input { padding: 0 11px; font-size: 12px; }
-	.add-button { min-width: 66px; }
+	.ingredient-input { height: 51px; padding: 0 11px; font-size: 12px; }
+	.add-button { min-width: 70px; height: 51px; }
 	.quick-adds { gap: 5px; }
 	.quick-label { width: 100%; }
 	.pantry-footer { gap: 12px; }

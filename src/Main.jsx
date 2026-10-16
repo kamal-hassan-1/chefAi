@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import IngredientList from './components/IngredientList';
 import Recipe from './components/Recipe';
 import chefAI from '../ai';
@@ -30,10 +30,6 @@ export default function Main() {
 	const [recipeError, setRecipeError] = useState('');
 	const [loading, setLoading] = useState(false);
 	const recipeRef = useRef(null);
-
-	useEffect(() => {
-		if (recipe) recipeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-	}, [recipe]);
 
 	const addIngredient = (value = draft) => {
 		const ingredient = value.trim().replace(/\s+/g, ' ');
@@ -75,6 +71,8 @@ export default function Main() {
 
 	const generateRecipe = async () => {
 		if (ingredients.length < 3 || loading) return;
+		recipeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		recipeRef.current?.focus({ preventScroll: true });
 		setLoading(true);
 		setRecipe('');
 		setRecipeError('');
@@ -180,7 +178,7 @@ export default function Main() {
 					</div>
 				</section>
 
-				<section className="recipe-stage" ref={recipeRef} aria-label="Recipe results" aria-live="polite">
+				<section className="recipe-stage" ref={recipeRef} tabIndex={-1} aria-label="Recipe results" aria-live="polite">
 					{loading ? (
 						<div className="empty-recipe loading-card">
 							<div className="loading-orbit"><span>✳</span></div>
